@@ -204,7 +204,7 @@ function buildCompare(){
       else if(model===total){status="一致";cls="ok"}
       else{status="数量差異";cls="warn"}
       if(multi)note="同一品番が風船 "+bomBalloons.get(k).join(", ")+" にあり（部品表計 "+total+"）";
-      cmpRows.push({kind:"part",balloon:b,partNo:r.partNo,name:r.name,kaihai:r.kaihai,bomQty:r.qty,models:e?[...e.names]:[],modelQty:e?model:null,status,cls,note});
+      cmpRows.push({kind:"part",balloon:b,partNo:r.partNo,name:r.name,kaihai:r.kaihai,bomQty:r.qty,models:e?[...e.names]:[],modelQty:e?model:null,status,cls,note,digits:e?Math.max(0,...[...e.names].map(nm=>commonPrefix(r.partNo,nm,9))):0});
     }
     const sups=active.filter(r=>r.balloon===b&&!r.partNo),folders=supFolders.get(b)||[],mm=supModels.get(b);
     if(sups.length||folders.length){
@@ -273,6 +273,8 @@ function supplementLines(items,matchKeys,keyFn,withConfig,otherTypes){
     return '<li>'+name+conf+qty+note+'</li>';
   }).join("")+'</ul>';
 }
+// 判定に、品番とモデル名が先頭から何文字一致したかを添える（例：一致(9)）
+const statusLabel=r=>r.status+(r.kind==="part"&&r.digits?"("+r.digits+")":"");
 function renderCompare(){
   buildCompare();
   const filter=$("cmpFilter").value,q=norm($("cmpSearch").value);
@@ -294,7 +296,7 @@ function renderCompare(){
     if(r.kind==="section"){pending=r;continue}
     if(!keep(r))continue;
     if(pending){out+='<tr class="sec"><td colspan="8">'+esc(pending.label)+"</td></tr>";pending=null}
-    const st='<span class="st '+r.cls+'">'+esc(r.status)+"</span>"+(r.note?'<span class="sub">'+esc(r.note)+"</span>":"");
+    const st='<span class="st '+r.cls+'">'+esc(statusLabel(r))+"</span>"+(r.note?'<span class="sub">'+esc(r.note)+"</span>":"");
     if(r.kind==="sup"){
       const m=supplementMatches(r);
       const allSizeQtyMatch=m.bs.size>0&&m.ms.size>0&&m.bs.size===m.ms.size&&[...m.bs].every(([k,v])=>m.ms.get(k)===v);
@@ -313,7 +315,7 @@ function renderCompare(){
       out+='<tr><td>'+esc(r.balloon)+'</td><td>'+(r.kind==="part"?"部品":"モデル")+(r.kaihai==="A"?'<span class="sub">改廃A</span>':"")+'</td><td><span class="code">'+mark(r.partNo)+'</span></td><td>'+(r.name?esc(r.name):'<span class="muted">—</span>')+'</td><td class="num">'+(r.bomQty==null?"":number(r.bomQty))+'</td><td>'+(exact?'<ul class="lines">'+r.models.map(name=>'<li>'+hlRanges(name,[[0,full(name)]])+'</li>').join("")+'</ul>':lines(r.models.map(name=>({name}))))+'</td><td class="num">'+(r.modelQty==null?"":number(r.modelQty))+'</td><td>'+st+'</td></tr>';
     }
   }
-  $("cmpTable").innerHTML=out?'<table class="cmp"><colgroup><col style="width:4%"><col style="width:5%"><col style="width:13%"><col style="width:21%"><col style="width:6%"><col style="width:34%"><col style="width:6%"><col style="width:11%"></colgroup><thead><tr class="grp-row"><th colspan="2"></th><th colspan="3" class="grp bom">部品表</th><th colspan="2" class="grp mdl">SOLIDWORKS モデル</th><th></th></tr><tr><th>風船</th><th>区分</th><th>品番 / 補材フォルダ</th><th>品名</th><th>数量</th><th>モデル名 / コンフィグ</th><th>数量</th><th>判定</th></tr></thead><tbody>'+out+"</tbody></table>":'<div class="empty" style="padding:24px 16px">該当する行がありません。</div>';
+  $("cmpTable").innerHTML=out?'<table class="cmp"><colgroup><col style="width:4%"><col style="width:5%"><col style="width:13%"><col style="width:20%"><col style="width:6%"><col style="width:33%"><col style="width:6%"><col style="width:13%"></colgroup><thead><tr class="grp-row"><th colspan="2"></th><th colspan="3" class="grp bom">部品表</th><th colspan="2" class="grp mdl">SOLIDWORKS モデル</th><th></th></tr><tr><th>風船</th><th>区分</th><th>品番 / 補材フォルダ</th><th>品名</th><th>数量</th><th>モデル名 / コンフィグ</th><th>数量</th><th>判定</th></tr></thead><tbody>'+out+"</tbody></table>":'<div class="empty" style="padding:24px 16px">該当する行がありません。</div>';
 }
 $("bomFile").addEventListener("change",async e=>{
   const file=e.target.files[0];e.target.value="";if(!file)return;
@@ -335,7 +337,7 @@ $("cmpExport").onclick=async()=>{
   for(const r of cmpRows){
     if(r.kind==="section")aoa.push(["【"+r.label+"】"]);
     else if(r.kind==="sup")aoa.push([r.balloon,"補材",r.folders.join("\n"),list(r.bomItems),r.bomItems.length?r.bomQty:"",list(r.models),r.modelQty??"",r.status,r.note]);
-    else aoa.push([r.balloon,r.kind==="part"?"部品":"モデル",r.partNo,r.name,r.bomQty??"",r.models.join("\n"),r.modelQty??"",r.status,r.note]);
+    else aoa.push([r.balloon,r.kind==="part"?"部品":"モデル",r.partNo,r.name,r.bomQty??"",r.models.join("\n"),r.modelQty??"",statusLabel(r),r.note]);
   }
   const ws=X.utils.aoa_to_sheet(aoa);ws["!cols"]=[6,7,16,40,10,40,9,16,40].map(w=>({wch:w}));
   const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,"照合");
