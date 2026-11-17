@@ -1,6 +1,6 @@
 {
-  "name": "SOLIDWORKS 構成ツリービューア",
-  "short_name": "構成ツリー",
+  "name": "SOLIDWORKS 構成確認ツール",
+  "short_name": "構成確認",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f3f6fa",

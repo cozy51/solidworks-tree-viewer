@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SOLIDWORKS 構成ツリービューア</title>
+<title>SOLIDWORKS 構成確認ツール</title>
 <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -17,19 +17,23 @@ button,.upload{font:inherit;border:1px solid #cbd6e2;border-radius:8px;backgroun
 .brand{display:flex;align-items:center;gap:12px}.brand img{width:40px;height:40px;flex:none;filter:drop-shadow(0 2px 4px rgba(23,63,120,.25))}
 .ico{width:16px;height:16px;flex:none;display:block}.ico-folder{color:#d4952b}.ico-asm{color:#2563aa}.ico-part{color:#5b7088}
 .tabs{display:flex;gap:4px;padding:0 20px;background:#fff;border-bottom:1px solid #dce3ec}.tab{border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;padding:11px 14px 9px;color:#5d6d82;font-weight:600}.tab:hover{background:#f3f7fc}.tab[aria-selected=true]{color:#2563aa;border-bottom-color:#2563aa}[hidden]{display:none!important}.compare{margin:18px 20px 20px}.compare .table-wrap{max-height:calc(100vh - 260px)}.compare .panel-header p{margin:4px 0 0;font-size:12px;color:#657588}.check{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#46566b;padding:0 4px}.summary{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px 0}.chip{font-size:12px;border-radius:999px;padding:4px 10px;background:#f0f3f7;color:#46566b}.table-wrap{overflow:auto;max-height:75vh;margin:12px 0 0;border-top:1px solid #e7ebf1}
-table.cmp{border-collapse:collapse;width:100%;font-size:13px}table.cmp th{position:sticky;top:0;background:#f6f8fb;text-align:left;font-weight:600;font-size:12px;color:#55657a;border-bottom:1px solid #dce3eb;padding:8px 10px;white-space:nowrap;z-index:1}table.cmp td{border-bottom:1px solid #edf0f4;padding:7px 10px;vertical-align:top}table.cmp td.num{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}table.cmp th:nth-child(5),table.cmp th:nth-child(7){text-align:center}table.cmp tr.sec td{background:#fafbfd;color:#5d6d82;font-size:12px;font-weight:600}table.cmp tr.sup td{background:#fbfcf7}.code{font-family:ui-monospace,Consolas,monospace;font-size:12px;white-space:nowrap}.lines{margin:0;padding:0;list-style:none}.lines li{white-space:nowrap}.lines li+li{margin-top:2px}.lines .q{color:#7a879a;margin-left:6px}.lines .config{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:4px;background:#e8f1ff;color:#1d5796;font-size:11px;white-space:nowrap}.muted{color:#97a3b3}.sub{display:block;font-size:11px;color:#7d8a9b;margin-top:2px}
-.match-mark{background:#dcfce7;color:#166534;border-radius:4px;padding:2px 5px;font-weight:650;box-decoration-break:clone;-webkit-box-decoration-break:clone}.match-num{background:#dcfce7;color:#166534;border-radius:4px;padding:2px 6px;font-weight:700}.diff-num{background:#ffedd5;color:#9a3412;border-radius:4px;padding:2px 6px;font-weight:700}.match-note{font-size:11px;color:#167342;margin-left:5px}.st{display:inline-block;font-size:11px;font-weight:600;border-radius:5px;padding:2px 7px;white-space:nowrap}.st.ok{background:#e3f4ea;color:#1d7444}.st.warn{background:#fff1d9;color:#9a5b00}.st.ng{background:#fde6e6;color:#b42323}.st.info{background:#e7f0fb;color:#24569a}
+table.cmp{border-collapse:collapse;width:100%;font-size:13px}table.cmp thead{position:sticky;top:0;z-index:2}table.cmp th{background:#f6f8fb;text-align:left;font-weight:600;font-size:12px;color:#55657a;border-bottom:1px solid #dce3eb;padding:8px 10px;white-space:nowrap;z-index:1}table.cmp td{border-bottom:1px solid #edf0f4;padding:7px 10px;vertical-align:top}table.cmp td.num{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}table.cmp th:nth-child(5),table.cmp th:nth-child(7){text-align:center}table.cmp tr.sec td{background:#fafbfd;color:#5d6d82;font-size:12px;font-weight:600}table.cmp tr.sup td{background:#fbfcf7}
+table.cmp tr.grp-row th{padding:6px 10px;border-bottom:0;font-size:12px;letter-spacing:.04em}table.cmp th.grp.bom{background:#e9f8ef;color:#166534;box-shadow:inset 0 3px 0 #34a865}table.cmp th.grp.mdl{background:#e8f1fd;color:#1e40af;box-shadow:inset 0 3px 0 #3b76d6}
+table.cmp tbody td:nth-child(6),table.cmp tbody td:nth-child(7){background:#f7faff}table.cmp tbody tr.sup td:nth-child(6),table.cmp tbody tr.sup td:nth-child(7){background:#f1f6fe}
+table.cmp th.grp.mdl,table.cmp thead tr:last-child th:nth-child(6),table.cmp tbody td:nth-child(6){border-left:3px solid #9fb3c8}
+table.cmp th.grp.bom,table.cmp thead tr:last-child th:nth-child(3),table.cmp tbody td:nth-child(3),table.cmp tbody td:nth-child(8),table.cmp thead tr:last-child th:nth-child(8){border-left:1px solid #dce3eb}.code{font-family:ui-monospace,Consolas,monospace;font-size:12px;white-space:nowrap}.lines{margin:0;padding:0;list-style:none}.lines li{white-space:nowrap}.lines li+li{margin-top:2px}.lines .q{color:#7a879a;margin-left:6px}.lines .config{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:4px;background:#f1f3f6;color:#475569;font-size:11px;white-space:nowrap}.muted{color:#97a3b3}.sub{display:block;font-size:11px;color:#7d8a9b;margin-top:2px}
+.match-mark{background:#dcfce7;color:#166534;border-radius:3px;padding:1px 1px;font-weight:650;box-decoration-break:clone;-webkit-box-decoration-break:clone}.match-num{background:#dcfce7;color:#166534;border-radius:4px;padding:2px 6px;font-weight:700}table.cmp td:nth-child(6) .match-mark,table.cmp td:nth-child(7) .match-num,.legend .m{background:#dbeafe;color:#1e40af}.legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12px;color:#5d6d82;padding:8px 16px 0}.legend span span{border-radius:3px;padding:1px 6px;font-weight:650;margin-right:4px}.legend .b{background:#dcfce7;color:#166534}.legend .d{background:#ffedd5;color:#9a3412}.diff-num{background:#ffedd5;color:#9a3412;border-radius:4px;padding:2px 6px;font-weight:700}.match-note{font-size:11px;color:#167342;margin-left:5px}.st{display:inline-block;font-size:11px;font-weight:600;border-radius:5px;padding:2px 7px;white-space:nowrap}.st.ok{background:#e3f4ea;color:#1d7444}.st.warn{background:#fff1d9;color:#9a5b00}.st.ng{background:#fde6e6;color:#b42323}.st.info{background:#e7f0fb;color:#24569a}
 @media(max-width:750px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-<header><div class="brand"><img src="icons/favicon.svg" alt=""><div><h1>SOLIDWORKS 構成ツリービューア</h1><p>CSVからフォルダ・モデルの階層を再現します。読み込んだデータはサーバーに送信されません。</p></div></div><div class="actions"><label class="upload">CSVを追加<input id="files" type="file" accept=".csv,text/csv" multiple></label><button id="export" disabled>JSON出力</button><button id="clearSaved" title="このブラウザに保存した構成CSV・部品表を消去します">保存データを消去</button></div></header>
+<header><div class="brand"><img src="icons/favicon.svg" alt=""><div><h1>SOLIDWORKS 構成確認ツール</h1><p>構成ツリーの表示と、部品表との照合を行います。読み込んだデータはサーバーに送信されません。</p></div></div><div class="actions"><label class="upload">CSVを追加<input id="files" type="file" accept=".csv,text/csv" multiple></label><button id="export" disabled>JSON出力</button><button id="clearSaved" title="このブラウザに保存した構成CSV・部品表を消去します">保存データを消去</button></div></header>
 <nav class="tabs" role="tablist"><button class="tab" role="tab" data-tab="tree" aria-selected="true">構成ツリー</button><button class="tab" role="tab" data-tab="cmp" aria-selected="false">部品表照合</button></nav>
 <div id="tab-tree" role="tabpanel"><div class="stats"><div class="stat"><strong id="folderCount">0</strong><span>フォルダ数</span></div><div class="stat"><strong id="modelCount">0</strong><span>モデル配置数</span></div><div class="stat"><strong id="asmCount">0</strong><span>サブアセンブリ数</span></div><div class="stat"><strong id="suppCount">0</strong><span>抑制ノード数</span></div></div>
 <div class="layout"><section class="panel"><div class="panel-header"><strong id="assemblyTitle">CSVを読み込んでください</strong><div class="bar"><input id="search" type="search" placeholder="フォルダ名・モデル名で検索"><button id="expand">すべて展開</button><button id="collapse">すべて折りたたむ</button></div><div class="bar"><select id="assemblySelect" aria-label="表示するアセンブリ"></select></div></div><div class="notice" id="message">CSVを追加すると構成ツリーが表示されます。</div><div class="tree" id="tree" role="tree"></div></section><aside class="panel"><div class="panel-header"><strong>選択した項目の詳細</strong></div><div class="details" id="details"><div class="empty">ツリーの項目を選択してください。</div></div></aside></div></div>
 <div id="tab-cmp" role="tabpanel" hidden><section class="panel compare"><div class="panel-header"><strong>部品表照合</strong><p>機構別部品明細表（Excel）と表示中の構成ツリーを照合します。品番ありの部品は品番の先頭9桁とモデル名（末尾の「-1」などのインスタンス番号を除く）で照合し、品番なしの補材は「+010」形式のフォルダ（＝風船10の補材）の中身と並べ、モデルごとのコンフィギュレーションも表示します。改廃Dの行と見出し（C）行は表示しません。</p>
 <div class="bar"><label class="upload">部品表Excelを読込<input id="bomFile" type="file" accept=".xlsx,.xlsm,.xls"></label><select id="cmpFilter" aria-label="表示する行"><option value="all">すべて表示</option><option value="diff">要確認のみ</option><option value="part">部品のみ</option><option value="sup">補材のみ</option></select><label class="check"><input id="cmpCountSupp" type="checkbox" checked>抑制中のモデルも数える</label><input id="cmpSearch" type="search" placeholder="風船・品番・品名で絞り込み"><button id="cmpExport" disabled>Excel出力</button></div></div>
-<div class="summary" id="cmpSummary"></div><div class="notice" id="cmpMessage">部品表Excelと構成CSVを読み込むと照合表が表示されます。</div><div class="table-wrap" id="cmpTable"></div></section></div>
+<div class="summary" id="cmpSummary"></div><div class="legend"><span><span class="b">緑</span>部品表側の一致</span><span><span class="m">青</span>モデル側の一致</span><span><span class="d">橙</span>数量の食い違い</span></div><div class="notice" id="cmpMessage">部品表Excelと構成CSVを読み込むと照合表が表示されます。</div><div class="table-wrap" id="cmpTable"></div></section></div>
 <footer>参照専用：SOLIDWORKSやCADファイルを変更しません。Google Drive保存機能は未実装です。業務データをGitHubへコミットしないでください。</footer>
 <script>
 "use strict";
@@ -222,6 +226,23 @@ function buildCompare(){
 }
 const lines=items=>items.length?'<ul class="lines">'+items.map(i=>"<li>"+esc(i.name)+(i.configuration?'<span class="config">コンフィグ: '+esc(i.configuration)+"</span>":"")+(i.qty!=null?'<span class="q">×'+esc(i.qty)+"</span>":"")+(i.suppressed?'<span class="q">（抑制 '+i.suppressed+"）</span>":"")+"</li>").join("")+"</ul>":'<span class="muted">—</span>';
 // 補材は形状記号(M)と長さ(X)を照合。M04X25 と M4X25 は同じサイズとして扱う。
+// text の [start,end) の範囲だけを緑でハイライトする（範囲外はそのまま）
+function hlRanges(text,ranges){
+  text=String(text??"");const rs=ranges.filter(([a,b])=>b>a).sort((x,y)=>x[0]-y[0]);let out="",pos=0;
+  for(const [a,b] of rs){if(a<pos)continue;out+=esc(text.slice(pos,a))+'<span class="match-mark">'+esc(text.slice(a,b))+"</span>";pos=b}
+  return out+esc(text.slice(pos));
+}
+// 先頭から1文字ずつ比べて一致した文字数（大文字小文字は区別しない、最大 max 文字）
+function commonPrefix(a,b,max){a=String(a??"").toUpperCase();b=String(b??"").toUpperCase();let i=0;while(i<max&&i<a.length&&i<b.length&&a[i]===b[i])i++;return i}
+// 補材の文字列から「種類（先頭の語）」と「サイズ（M4X25 など）」の位置を取り出す
+function fastenerParts(v){
+  const t=String(v??""),m=/M\s*0*(\d+)\s*[X×]\s*0*(\d+)(?!\d)/i.exec(t);
+  const size=m?{key:"M"+Number(m[1])+"X"+Number(m[2]),range:[m.index,m.index+m[0].length]}:null;
+  const tm=/^\s*([^\s(（_]+)/.exec(t);
+  const type=tm&&(!size||tm.index+tm[0].length<=size.range[0])?{key:norm(tm[1]),range:[tm[0].length-tm[1].length,tm[0].length]}:null;
+  return {size,type};
+}
+const typesOf=list=>new Set(list.map(v=>fastenerParts(v).type?.key).filter(Boolean));
 function fastenerSize(v){
   const m=String(v??"").toUpperCase().replace(/\s+/g,"").match(/M0*(\d+)X0*(\d+)(?!\d)/);
   return m?"M"+Number(m[1])+"X"+Number(m[2]):"";
@@ -234,12 +255,17 @@ function supplementMatches(r){
   const qtyMatched=new Set([...matched].filter(k=>bs.get(k)===ms.get(k)));
   return {matched,qtyMatched,bs,ms};
 }
-function supplementLines(items,matchKeys,keyFn,withConfig){
+function supplementLines(items,matchKeys,keyFn,withConfig,otherTypes){
   if(!items.length)return '<span class="muted">—</span>';
   return '<ul class="lines">'+items.map(i=>{
     const k=keyFn(i),matched=k&&matchKeys.has(k);
-    const name=matched?'<span class="match-mark">'+esc(i.name)+'</span>':esc(i.name);
-    const conf=withConfig&&i.configuration?'<span class="config'+(matched?' match-mark':'')+'">コンフィグ: '+esc(i.configuration)+'</span>':"";
+    const src=withConfig?i.configuration:i.name,fp=fastenerParts(src);
+    const typeOk=matched&&fp.type&&otherTypes.has(fp.type.key);
+    const ranges=[];if(matched&&fp.size)ranges.push(fp.size.range);if(typeOk)ranges.push(fp.type.range);
+    let name;
+    if(withConfig){const n=typeOk?commonPrefix(i.name,fp.type.key,fp.type.key.length):0;name=hlRanges(i.name,n===fp.type?.key.length?[[0,n]]:[])}
+    else name=hlRanges(i.name,ranges);
+    const conf=withConfig&&i.configuration?'<span class="config">コンフィグ: '+hlRanges(i.configuration,ranges)+'</span>':"";
     const qty=i.qty!=null?'<span class="q">×'+esc(i.qty)+'</span>':"";
     const note=matched?'<span class="match-note">✓ サイズ一致</span>':"";
     return '<li>'+name+conf+qty+note+'</li>';
@@ -272,17 +298,18 @@ function renderCompare(){
       const allSizeQtyMatch=m.bs.size>0&&m.ms.size>0&&m.bs.size===m.ms.size&&[...m.bs].every(([k,v])=>m.ms.get(k)===v);
       const totalDiff=r.bomItems.length>0&&r.models.length>0&&r.bomQty!==r.modelQty;
       const num=v=>allSizeQtyMatch?'<span class="match-num">'+esc(v)+'</span>':totalDiff?'<span class="diff-num">'+esc(v)+'</span>':esc(v);
-      out+='<tr class="sup"><td>'+esc(r.balloon)+'</td><td>補材</td><td>'+(r.folders.length?'<span class="code">'+r.folders.map(esc).join("<br>")+"</span>":'<span class="muted">—</span>')+'</td><td>'+supplementLines(r.bomItems,m.matched,i=>fastenerSize(i.name),false)+'</td><td class="num">'+(r.bomItems.length?num(r.bomQty):"")+'</td><td>'+supplementLines(r.models,m.matched,i=>fastenerSize(i.configuration),true)+'</td><td class="num">'+(r.modelQty==null?"":num(r.modelQty))+'</td><td>'+st+(allSizeQtyMatch?'<span class="sub" style="color:#167342">✓ サイズ別数量も一致</span>':"")+'</td></tr>';
+      out+='<tr class="sup"><td>'+esc(r.balloon)+'</td><td>補材</td><td>'+(r.folders.length?'<span class="code">'+r.folders.map(esc).join("<br>")+"</span>":'<span class="muted">—</span>')+'</td><td>'+supplementLines(r.bomItems,m.matched,i=>fastenerSize(i.name),false,typesOf(r.models.map(i=>i.configuration)))+'</td><td class="num">'+(r.bomItems.length?num(r.bomQty):"")+'</td><td>'+supplementLines(r.models,m.matched,i=>fastenerSize(i.configuration),true,typesOf(r.bomItems.map(i=>i.name)))+'</td><td class="num">'+(r.modelQty==null?"":num(r.modelQty))+'</td><td>'+st+(allSizeQtyMatch?'<span class="sub" style="color:#167342">✓ サイズ別数量も一致</span>':"")+'</td></tr>';
     }else{
       // 品番とモデルが対応していれば（数量が違っても）品番・モデル名は緑、数量は一致なら緑・差異ならオレンジ
       const found=r.kind==="part"&&(r.status==="一致"||r.status==="数量差異"),qtyOk=r.status==="一致";
       const exact=found;
-      const mark=t=>found?'<span class="match-mark">'+esc(t)+'</span>':esc(t);
+      const pre=found?Math.max(0,...r.models.map(nm=>commonPrefix(r.partNo,nm,9))):0;
+      const mark=t=>hlRanges(t,[[0,pre]]);
       const number=t=>found?'<span class="'+(qtyOk?"match-num":"diff-num")+'">'+esc(t)+'</span>':esc(t);
-      out+='<tr><td>'+esc(r.balloon)+'</td><td>'+(r.kind==="part"?"部品":"モデル")+(r.kaihai==="A"?'<span class="sub">改廃A</span>':"")+'</td><td><span class="code">'+mark(r.partNo)+'</span></td><td>'+(r.name?esc(r.name):'<span class="muted">—</span>')+'</td><td class="num">'+(r.bomQty==null?"":number(r.bomQty))+'</td><td>'+(exact?'<ul class="lines">'+r.models.map(name=>'<li><span class="match-mark">'+esc(name)+'</span></li>').join("")+'</ul>':lines(r.models.map(name=>({name}))))+'</td><td class="num">'+(r.modelQty==null?"":number(r.modelQty))+'</td><td>'+st+'</td></tr>';
+      out+='<tr><td>'+esc(r.balloon)+'</td><td>'+(r.kind==="part"?"部品":"モデル")+(r.kaihai==="A"?'<span class="sub">改廃A</span>':"")+'</td><td><span class="code">'+mark(r.partNo)+'</span></td><td>'+(r.name?esc(r.name):'<span class="muted">—</span>')+'</td><td class="num">'+(r.bomQty==null?"":number(r.bomQty))+'</td><td>'+(exact?'<ul class="lines">'+r.models.map(name=>'<li>'+hlRanges(name,[[0,commonPrefix(r.partNo,name,9)]])+'</li>').join("")+'</ul>':lines(r.models.map(name=>({name}))))+'</td><td class="num">'+(r.modelQty==null?"":number(r.modelQty))+'</td><td>'+st+'</td></tr>';
     }
   }
-  $("cmpTable").innerHTML=out?'<table class="cmp"><thead><tr><th>風船</th><th>区分</th><th>品番 / 補材フォルダ</th><th>品名（部品表）</th><th>部品表数量</th><th>モデル（SOLIDWORKS）</th><th>モデル数</th><th>判定</th></tr></thead><tbody>'+out+"</tbody></table>":'<div class="empty" style="padding:24px 16px">該当する行がありません。</div>';
+  $("cmpTable").innerHTML=out?'<table class="cmp"><thead><tr class="grp-row"><th colspan="2"></th><th colspan="3" class="grp bom">部品表</th><th colspan="2" class="grp mdl">SOLIDWORKS モデル</th><th></th></tr><tr><th>風船</th><th>区分</th><th>品番 / 補材フォルダ</th><th>品名</th><th>数量</th><th>モデル名 / コンフィグ</th><th>数量</th><th>判定</th></tr></thead><tbody>'+out+"</tbody></table>":'<div class="empty" style="padding:24px 16px">該当する行がありません。</div>';
 }
 $("bomFile").addEventListener("change",async e=>{
   const file=e.target.files[0];e.target.value="";if(!file)return;
