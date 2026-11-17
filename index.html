@@ -18,7 +18,7 @@ button,.upload{font:inherit;border:1px solid #cbd6e2;border-radius:8px;backgroun
 .ico{width:16px;height:16px;flex:none;display:block}.ico-folder{color:#d4952b}.ico-asm{color:#2563aa}.ico-part{color:#5b7088}
 .tabs{display:flex;gap:4px;padding:0 20px;background:#fff;border-bottom:1px solid #dce3ec}.tab{border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;padding:11px 14px 9px;color:#5d6d82;font-weight:600}.tab:hover{background:#f3f7fc}.tab[aria-selected=true]{color:#2563aa;border-bottom-color:#2563aa}[hidden]{display:none!important}.compare{margin:18px 20px 20px}.compare .table-wrap{max-height:calc(100vh - 260px)}.compare .panel-header p{margin:4px 0 0;font-size:12px;color:#657588}.check{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#46566b;padding:0 4px}.summary{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px 0}.chip{font-size:12px;border-radius:999px;padding:4px 10px;background:#f0f3f7;color:#46566b}.table-wrap{overflow:auto;max-height:75vh;margin:12px 0 0;border-top:1px solid #e7ebf1}
 table.cmp{border-collapse:collapse;width:100%;font-size:13px}table.cmp th{position:sticky;top:0;background:#f6f8fb;text-align:left;font-weight:600;font-size:12px;color:#55657a;border-bottom:1px solid #dce3eb;padding:8px 10px;white-space:nowrap;z-index:1}table.cmp td{border-bottom:1px solid #edf0f4;padding:7px 10px;vertical-align:top}table.cmp td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}table.cmp tr.sec td{background:#fafbfd;color:#5d6d82;font-size:12px;font-weight:600}table.cmp tr.sup td{background:#fbfcf7}.code{font-family:ui-monospace,Consolas,monospace;font-size:12px;white-space:nowrap}.lines{margin:0;padding:0;list-style:none}.lines li+li{margin-top:2px}.lines .q{color:#7a879a;margin-left:6px}.lines .config{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:4px;background:#e8f1ff;color:#1d5796;font-size:11px;white-space:nowrap}.muted{color:#97a3b3}.sub{display:block;font-size:11px;color:#7d8a9b;margin-top:2px}
-.st{display:inline-block;font-size:11px;font-weight:600;border-radius:5px;padding:2px 7px;white-space:nowrap}.st.ok{background:#e3f4ea;color:#1d7444}.st.warn{background:#fff1d9;color:#9a5b00}.st.ng{background:#fde6e6;color:#b42323}.st.info{background:#e7f0fb;color:#24569a}
+.match-mark{background:#dcfce7;color:#166534;border-radius:4px;padding:2px 5px;font-weight:650;box-decoration-break:clone;-webkit-box-decoration-break:clone}.match-num{background:#dcfce7;color:#166534;border-radius:4px;padding:2px 6px;font-weight:700}.match-note{font-size:11px;color:#167342;margin-left:5px}.st{display:inline-block;font-size:11px;font-weight:600;border-radius:5px;padding:2px 7px;white-space:nowrap}.st.ok{background:#e3f4ea;color:#1d7444}.st.warn{background:#fff1d9;color:#9a5b00}.st.ng{background:#fde6e6;color:#b42323}.st.info{background:#e7f0fb;color:#24569a}
 @media(max-width:750px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
@@ -221,6 +221,30 @@ function buildCompare(){
     for(const [name,e] of [...extra].sort((a,b)=>a[0].localeCompare(b[0])))cmpRows.push({kind:"extra",balloon:"",partNo:"",name:"",bomQty:null,models:[name],modelQty:e.count,status:e.deleted?"部品表で削除済み":"部品表になし",cls:e.deleted?"ng":"warn",note:""})}
 }
 const lines=items=>items.length?'<ul class="lines">'+items.map(i=>"<li>"+esc(i.name)+(i.configuration?'<span class="config">コンフィグ: '+esc(i.configuration)+"</span>":"")+(i.qty!=null?'<span class="q">×'+esc(i.qty)+"</span>":"")+(i.suppressed?'<span class="q">（抑制 '+i.suppressed+"）</span>":"")+"</li>").join("")+"</ul>":'<span class="muted">—</span>';
+// 補材は形状記号(M)と長さ(X)を照合。M04X25 と M4X25 は同じサイズとして扱う。
+function fastenerSize(v){
+  const m=String(v??"").toUpperCase().replace(/\s+/g,"").match(/M0*(\d+)X0*(\d+)(?!\d)/);
+  return m?"M"+Number(m[1])+"X"+Number(m[2]):"";
+}
+function supplementMatches(r){
+  const bs=new Map(),ms=new Map();
+  for(const i of r.bomItems){const k=fastenerSize(i.name);if(k)bs.set(k,(bs.get(k)||0)+Number(i.qty||0))}
+  for(const i of r.models){const k=fastenerSize(i.configuration);if(k)ms.set(k,(ms.get(k)||0)+Number(i.qty||0))}
+  const matched=new Set([...bs.keys()].filter(k=>ms.has(k)));
+  const qtyMatched=new Set([...matched].filter(k=>bs.get(k)===ms.get(k)));
+  return {matched,qtyMatched,bs,ms};
+}
+function supplementLines(items,matchKeys,keyFn,withConfig){
+  if(!items.length)return '<span class="muted">—</span>';
+  return '<ul class="lines">'+items.map(i=>{
+    const k=keyFn(i),matched=k&&matchKeys.has(k);
+    const name=matched?'<span class="match-mark">'+esc(i.name)+'</span>':esc(i.name);
+    const conf=withConfig&&i.configuration?'<span class="config'+(matched?' match-mark':'')+'">コンフィグ: '+esc(i.configuration)+'</span>':"";
+    const qty=i.qty!=null?'<span class="q">×'+esc(i.qty)+'</span>':"";
+    const note=matched?'<span class="match-note">✓ サイズ一致</span>':"";
+    return '<li>'+name+conf+qty+note+'</li>';
+  }).join("")+'</ul>';
+}
 function renderCompare(){
   buildCompare();
   const filter=$("cmpFilter").value,q=norm($("cmpSearch").value);
@@ -243,8 +267,17 @@ function renderCompare(){
     if(!keep(r))continue;
     if(pending){out+='<tr class="sec"><td colspan="8">'+esc(pending.label)+"</td></tr>";pending=null}
     const st='<span class="st '+r.cls+'">'+esc(r.status)+"</span>"+(r.note?'<span class="sub">'+esc(r.note)+"</span>":"");
-    if(r.kind==="sup")out+='<tr class="sup"><td>'+esc(r.balloon)+"</td><td>補材</td><td>"+(r.folders.length?'<span class="code">'+r.folders.map(esc).join("<br>")+"</span>":'<span class="muted">—</span>')+"</td><td>"+lines(r.bomItems)+'</td><td class="num">'+(r.bomItems.length?r.bomQty:"")+"</td><td>"+lines(r.models)+'</td><td class="num">'+(r.modelQty??"")+"</td><td>"+st+"</td></tr>";
-    else out+="<tr><td>"+esc(r.balloon)+"</td><td>"+(r.kind==="part"?"部品":"モデル")+(r.kaihai==="A"?'<span class="sub">改廃A</span>':"")+'</td><td><span class="code">'+esc(r.partNo)+"</span></td><td>"+(r.name?esc(r.name):'<span class="muted">—</span>')+'</td><td class="num">'+(r.bomQty??"")+"</td><td>"+lines(r.models.map(name=>({name})))+'</td><td class="num">'+(r.modelQty??"")+"</td><td>"+st+"</td></tr>";
+    if(r.kind==="sup"){
+      const m=supplementMatches(r);
+      const allSizeQtyMatch=m.bs.size>0&&m.ms.size>0&&m.bs.size===m.ms.size&&[...m.bs].every(([k,v])=>m.ms.get(k)===v);
+      const num=v=>allSizeQtyMatch?'<span class="match-num">'+esc(v)+'</span>':esc(v);
+      out+='<tr class="sup"><td>'+esc(r.balloon)+'</td><td>補材</td><td>'+(r.folders.length?'<span class="code">'+r.folders.map(esc).join("<br>")+"</span>":'<span class="muted">—</span>")+'</td><td>'+supplementLines(r.bomItems,m.matched,i=>fastenerSize(i.name),false)+'</td><td class="num">'+(r.bomItems.length?num(r.bomQty):"")+'</td><td>'+supplementLines(r.models,m.matched,i=>fastenerSize(i.configuration),true)+'</td><td class="num">'+(r.modelQty==null?"":num(r.modelQty))+'</td><td>'+st+(allSizeQtyMatch?'<span class="sub" style="color:#167342">✓ サイズ別数量も一致</span>':"")+'</td></tr>';
+    }else{
+      const exact=r.kind==="part"&&r.status==="一致";
+      const mark=t=>exact?'<span class="match-mark">'+esc(t)+'</span>':esc(t);
+      const number=t=>exact?'<span class="match-num">'+esc(t)+'</span>':esc(t);
+      out+='<tr><td>'+esc(r.balloon)+'</td><td>'+(r.kind==="part"?"部品":"モデル")+(r.kaihai==="A"?'<span class="sub">改廃A</span>':"")+'</td><td><span class="code">'+mark(r.partNo)+'</span></td><td>'+(r.name?esc(r.name):'<span class="muted">—</span>')+'</td><td class="num">'+(r.bomQty==null?"":number(r.bomQty))+'</td><td>'+lines(r.models.map(name=>({name})))+'</td><td class="num">'+(r.modelQty==null?"":number(r.modelQty))+'</td><td>'+st+'</td></tr>';
+    }
   }
   $("cmpTable").innerHTML=out?'<table class="cmp"><thead><tr><th>風船</th><th>区分</th><th>品番 / 補材フォルダ</th><th>品名（部品表）</th><th>部品表数量</th><th>モデル（SOLIDWORKS）</th><th>モデル数</th><th>判定</th></tr></thead><tbody>'+out+"</tbody></table>":'<div class="empty" style="padding:24px 16px">該当する行がありません。</div>';
 }
