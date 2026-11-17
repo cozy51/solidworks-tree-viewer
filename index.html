@@ -16,19 +16,20 @@ button,.upload{font:inherit;border:1px solid #cbd6e2;border-radius:8px;backgroun
 .layout{display:grid;grid-template-columns:minmax(300px,1.25fr) minmax(280px,.85fr);gap:15px;margin:0 20px 20px}.panel{min-width:0;overflow:hidden}.panel-header{padding:16px;border-bottom:1px solid #e7ebf1}.panel-header strong{display:block}.bar{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}input[type=search],select{font:inherit;border:1px solid #ccd7e3;border-radius:7px;padding:9px;min-width:0}input[type=search]{flex:1;min-width:140px}select{max-width:100%}.tree{padding:12px;max-height:68vh;overflow:auto;min-height:220px}.tree-node{display:flex;gap:5px;align-items:center;cursor:pointer;border-radius:5px;min-height:30px;font-size:13px;white-space:nowrap}.tree-node:hover{background:#f0f5fc}.tree-node.active{background:#e4efff}.toggle{border:0;padding:2px;width:26px;background:transparent}.children{padding-left:22px;border-left:1px solid #e6eaf0;margin-left:12px}.name{overflow:hidden;text-overflow:ellipsis}.tag{font-size:10px;color:#7c8796;background:#f0f2f5;border-radius:4px;padding:2px 5px}.details{padding:18px;overflow:auto;max-height:68vh}dl{margin:0}dt{font-size:12px;color:#617187;margin-top:13px}dd{margin:4px 0;overflow-wrap:anywhere;font-size:14px}footer{padding:0 20px 20px;font-size:12px;color:#718096}.notice{margin:10px 14px;color:#62718a;font-size:12px}.empty{color:#7d8a9b;font-size:14px;padding:24px 9px}
 .brand{display:flex;align-items:center;gap:12px}.brand img{width:40px;height:40px;flex:none;filter:drop-shadow(0 2px 4px rgba(23,63,120,.25))}
 .ico{width:16px;height:16px;flex:none;display:block}.ico-folder{color:#d4952b}.ico-asm{color:#2563aa}.ico-part{color:#5b7088}
-.compare{margin:0 20px 20px}.compare .panel-header p{margin:4px 0 0;font-size:12px;color:#657588}.summary{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px 0}.chip{font-size:12px;border-radius:999px;padding:4px 10px;background:#f0f3f7;color:#46566b}.table-wrap{overflow:auto;max-height:75vh;margin:12px 0 0;border-top:1px solid #e7ebf1}
+.tabs{display:flex;gap:4px;padding:0 20px;background:#fff;border-bottom:1px solid #dce3ec}.tab{border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;padding:11px 14px 9px;color:#5d6d82;font-weight:600}.tab:hover{background:#f3f7fc}.tab[aria-selected=true]{color:#2563aa;border-bottom-color:#2563aa}[hidden]{display:none!important}.compare{margin:18px 20px 20px}.compare .table-wrap{max-height:calc(100vh - 260px)}.compare .panel-header p{margin:4px 0 0;font-size:12px;color:#657588}.check{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#46566b;padding:0 4px}.summary{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px 0}.chip{font-size:12px;border-radius:999px;padding:4px 10px;background:#f0f3f7;color:#46566b}.table-wrap{overflow:auto;max-height:75vh;margin:12px 0 0;border-top:1px solid #e7ebf1}
 table.cmp{border-collapse:collapse;width:100%;font-size:13px}table.cmp th{position:sticky;top:0;background:#f6f8fb;text-align:left;font-weight:600;font-size:12px;color:#55657a;border-bottom:1px solid #dce3eb;padding:8px 10px;white-space:nowrap;z-index:1}table.cmp td{border-bottom:1px solid #edf0f4;padding:7px 10px;vertical-align:top}table.cmp td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}table.cmp tr.sec td{background:#fafbfd;color:#5d6d82;font-size:12px;font-weight:600}table.cmp tr.sup td{background:#fbfcf7}.code{font-family:ui-monospace,Consolas,monospace;font-size:12px;white-space:nowrap}.lines{margin:0;padding:0;list-style:none}.lines li+li{margin-top:2px}.lines .q{color:#7a879a;margin-left:6px}.muted{color:#97a3b3}.sub{display:block;font-size:11px;color:#7d8a9b;margin-top:2px}
 .st{display:inline-block;font-size:11px;font-weight:600;border-radius:5px;padding:2px 7px;white-space:nowrap}.st.ok{background:#e3f4ea;color:#1d7444}.st.warn{background:#fff1d9;color:#9a5b00}.st.ng{background:#fde6e6;color:#b42323}.st.info{background:#e7f0fb;color:#24569a}
 @media(max-width:750px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-<header><div class="brand"><img src="icons/favicon.svg" alt=""><div><h1>SOLIDWORKS 構成ツリービューア</h1><p>CSVからフォルダ・モデルの階層を再現します。読み込んだデータはサーバーに送信されません。</p></div></div><div class="actions"><label class="upload">CSVを追加<input id="files" type="file" accept=".csv,text/csv" multiple></label><button id="export" disabled>JSON出力</button></div></header>
-<div class="stats"><div class="stat"><strong id="folderCount">0</strong><span>フォルダ数</span></div><div class="stat"><strong id="modelCount">0</strong><span>モデル配置数</span></div><div class="stat"><strong id="asmCount">0</strong><span>サブアセンブリ数</span></div><div class="stat"><strong id="suppCount">0</strong><span>抑制ノード数</span></div></div>
-<div class="layout"><section class="panel"><div class="panel-header"><strong id="assemblyTitle">CSVを読み込んでください</strong><div class="bar"><input id="search" type="search" placeholder="フォルダ名・モデル名で検索"><button id="expand">すべて展開</button><button id="collapse">すべて折りたたむ</button></div><div class="bar"><select id="assemblySelect" aria-label="表示するアセンブリ"></select></div></div><div class="notice" id="message">CSVを追加すると構成ツリーが表示されます。</div><div class="tree" id="tree" role="tree"></div></section><aside class="panel"><div class="panel-header"><strong>選択した項目の詳細</strong></div><div class="details" id="details"><div class="empty">ツリーの項目を選択してください。</div></div></aside></div>
-<section class="panel compare"><div class="panel-header"><strong>部品表照合</strong><p>機構別部品明細表（Excel）と表示中の構成ツリーを照合します。品番ありの部品はモデル名・ファイル名に含まれる品番で照合し、品番なしの補材は「+010」形式のフォルダ（＝風船10の補材）の中身と並べて表示します。改廃Dの行は対象外です。</p>
-<div class="bar"><label class="upload">部品表Excelを読込<input id="bomFile" type="file" accept=".xlsx,.xlsm,.xls"></label><select id="cmpFilter" aria-label="表示する行"><option value="all">すべて表示</option><option value="diff">要確認のみ</option><option value="part">部品のみ</option><option value="sup">補材のみ</option></select><input id="cmpSearch" type="search" placeholder="風船・品番・品名で絞り込み"><button id="cmpExport" disabled>Excel出力</button></div></div>
-<div class="summary" id="cmpSummary"></div><div class="notice" id="cmpMessage">部品表Excelと構成CSVを読み込むと照合表が表示されます。</div><div class="table-wrap" id="cmpTable"></div></section>
+<header><div class="brand"><img src="icons/favicon.svg" alt=""><div><h1>SOLIDWORKS 構成ツリービューア</h1><p>CSVからフォルダ・モデルの階層を再現します。読み込んだデータはサーバーに送信されません。</p></div></div><div class="actions"><label class="upload">CSVを追加<input id="files" type="file" accept=".csv,text/csv" multiple></label><button id="export" disabled>JSON出力</button><button id="clearSaved" title="このブラウザに保存した構成CSV・部品表を消去します">保存データを消去</button></div></header>
+<nav class="tabs" role="tablist"><button class="tab" role="tab" data-tab="tree" aria-selected="true">構成ツリー</button><button class="tab" role="tab" data-tab="cmp" aria-selected="false">部品表照合</button></nav>
+<div id="tab-tree" role="tabpanel"><div class="stats"><div class="stat"><strong id="folderCount">0</strong><span>フォルダ数</span></div><div class="stat"><strong id="modelCount">0</strong><span>モデル配置数</span></div><div class="stat"><strong id="asmCount">0</strong><span>サブアセンブリ数</span></div><div class="stat"><strong id="suppCount">0</strong><span>抑制ノード数</span></div></div>
+<div class="layout"><section class="panel"><div class="panel-header"><strong id="assemblyTitle">CSVを読み込んでください</strong><div class="bar"><input id="search" type="search" placeholder="フォルダ名・モデル名で検索"><button id="expand">すべて展開</button><button id="collapse">すべて折りたたむ</button></div><div class="bar"><select id="assemblySelect" aria-label="表示するアセンブリ"></select></div></div><div class="notice" id="message">CSVを追加すると構成ツリーが表示されます。</div><div class="tree" id="tree" role="tree"></div></section><aside class="panel"><div class="panel-header"><strong>選択した項目の詳細</strong></div><div class="details" id="details"><div class="empty">ツリーの項目を選択してください。</div></div></aside></div></div>
+<div id="tab-cmp" role="tabpanel" hidden><section class="panel compare"><div class="panel-header"><strong>部品表照合</strong><p>機構別部品明細表（Excel）と表示中の構成ツリーを照合します。品番ありの部品は品番の先頭9桁とモデル名（末尾の「-1」などのインスタンス番号を除く）で照合し、品番なしの補材は「+010」形式のフォルダ（＝風船10の補材）の中身と並べて表示します。改廃Dの行と見出し（C）行は表示しません。</p>
+<div class="bar"><label class="upload">部品表Excelを読込<input id="bomFile" type="file" accept=".xlsx,.xlsm,.xls"></label><select id="cmpFilter" aria-label="表示する行"><option value="all">すべて表示</option><option value="diff">要確認のみ</option><option value="part">部品のみ</option><option value="sup">補材のみ</option></select><label class="check"><input id="cmpCountSupp" type="checkbox" checked>抑制中のモデルも数える</label><input id="cmpSearch" type="search" placeholder="風船・品番・品名で絞り込み"><button id="cmpExport" disabled>Excel出力</button></div></div>
+<div class="summary" id="cmpSummary"></div><div class="notice" id="cmpMessage">部品表Excelと構成CSVを読み込むと照合表が表示されます。</div><div class="table-wrap" id="cmpTable"></div></section></div>
 <footer>参照専用：SOLIDWORKSやCADファイルを変更しません。Google Drive保存機能は未実装です。業務データをGitHubへコミットしないでください。</footer>
 <script>
 "use strict";
@@ -57,7 +58,7 @@ function addData(name,rows){
   switchTo(i>=0?i:datasets.length-1);
 }
 function switchTo(i){
-  current=i;selectedId=null;let d=datasets[i];expanded=new Set(d.roots.map(r=>r.NodeId));
+  current=i;store.set("current",i);selectedId=null;let d=datasets[i];expanded=new Set(d.roots.map(r=>r.NodeId));
   $("assemblySelect").value=String(i);$("assemblyTitle").textContent=d.assembly;
   $("folderCount").textContent=d.rows.filter(r=>r.NodeType==="folder").length.toLocaleString();
   $("modelCount").textContent=d.rows.filter(r=>r.NodeType==="component").length.toLocaleString();
@@ -97,7 +98,7 @@ $("search").addEventListener("input",render);
 $("expand").onclick=()=>{if(current>=0){expanded=new Set(datasets[current].map.keys());render()}};
 $("collapse").onclick=()=>{expanded.clear();render()};
 $("assemblySelect").onchange=e=>switchTo(Number(e.target.value));
-$("files").addEventListener("change",async e=>{for(const file of e.target.files){try{addData(file.name,parseCSV(await file.text()))}catch(err){alert(file.name+" の読込に失敗: "+err.message)}}e.target.value=""});
+$("files").addEventListener("change",async e=>{for(const file of e.target.files){try{const text=await file.text();addData(file.name,parseCSV(text));saveCsv(file.name,text)}catch(err){alert(file.name+" の読込に失敗: "+err.message)}}e.target.value=""});
 $("export").onclick=()=>{if(current<0)return;const d=datasets[current],data={schemaVersion:"1.0",assemblyName:d.assembly,sourceFile:d.name,nodes:d.rows.map(r=>({id:r.NodeId,parentId:r.ParentId||null,level:Number(r.Level),order:Number(r.Order),nodeType:r.NodeType,folderName:r.FolderName,folderPath:r.FolderPath,modelName:r.ModelName,componentType:r.ComponentType,filePath:r.FilePath,configuration:r.Configuration,suppressed:r.Suppressed==="true"}))},url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json;charset=utf-8"})),a=document.createElement("a");a.href=url;a.download=d.assembly.replace(/[^\w\u3040-\u30ff\u3400-\u9fff.-]/g,"_")+"_Tree.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 
 /* ---------- 部品表照合 ---------- */
@@ -138,15 +139,23 @@ function parseBOM(XLSX,buf,fileName){
 const balloonKey=b=>{const m=String(b).match(/^(\d+)(.*)$/);return m?[Number(m[1]),m[2]]:[Infinity,String(b)]};
 const byBalloon=(a,b)=>{const x=balloonKey(a),y=balloonKey(b);return x[0]-y[0]||x[1].localeCompare(y[1])};
 const SUP_FOLDER=/^\s*\+\s*(\d+)/;
+// 構成ツリーのモデル名末尾の「-1」「<1>」はインスタンス番号なので除く
+const stripInstance=s=>String(s??"").trim().replace(/(?:-\d+|<\d+>)$/,"");
+const displayName=n=>stripInstance(n.ModelName)||n.NodeId;
+const baseName=n=>norm(stripInstance(n.ModelName));
 function buildCompare(){
   cmpRows=[];
   if(!bom||current<0)return;
   const d=datasets[current],active=bom.rows.filter(r=>r.kaihai!=="D");
   const activeNos=new Set(active.filter(r=>r.partNo).map(r=>norm(r.partNo)));
   const deletedNos=new Set(bom.rows.filter(r=>r.kaihai==="D"&&r.partNo).map(r=>norm(r.partNo)).filter(p=>!activeNos.has(p)));
-  const allNos=[...activeNos,...deletedNos].sort((a,b)=>b.length-a.length);
+  // 部品モデルは品番の先頭9桁で作る運用。照合キー＝品番の先頭9桁
+  const keyOf=no=>no.slice(0,9),keyToNo=new Map();
+  for(const no of [...activeNos,...deletedNos])if(!keyToNo.has(keyOf(no))||activeNos.has(no))keyToNo.set(keyOf(no),no);
+  const keys=[...keyToNo.keys()].sort((a,b)=>b.length-a.length);
+  const countSupp=$("cmpCountSupp").checked,isOff=n=>!countSupp&&n.Suppressed==="true";
   const parentOf=n=>d.map.get(n.ParentId);
-  const modelText=n=>norm(n.ModelName+" "+String(n.FilePath||"").split(/[\\/]/).pop());
+  const fileBase=n=>String(n.FilePath||"").split(/[\\/]/).pop().replace(/\.[^.]+$/,"");
   // 各ノードの判定材料
   const info=new Map();
   const infoOf=n=>{
@@ -156,7 +165,7 @@ function buildCompare(){
     const it={sup:pi?pi.sup:null,match:null,underMatched:false,underUnmatched:false};
     if(pi&&p.NodeType==="component"){if(pi.match&&activeNos.has(pi.match)||pi.underMatched)it.underMatched=true;else it.underUnmatched=true}
     if(n.NodeType==="folder"){const m=String(n.FolderName).match(SUP_FOLDER);if(m)it.sup={balloon:String(Number(m[1])),folder:n}}
-    else{const t=modelText(n);it.match=allNos.find(no=>t.includes(no))||null}
+    else{const cands=[baseName(n),norm(fileBase(n))].filter(Boolean);const k=keys.find(k=>cands.some(c=>c.startsWith(k)));it.match=k?keyToNo.get(k):null}
     info.set(n.NodeId,it);return it;
   };
   const comps=[...d.map.values()].filter(n=>n.NodeType==="component");
@@ -165,7 +174,7 @@ function buildCompare(){
   const placed=new Map();
   for(const n of comps){const it=info.get(n.NodeId);if(it.sup||!it.match||it.underMatched)continue;
     const e=placed.get(it.match)??{count:0,suppressed:0,names:new Set()};
-    if(n.Suppressed==="true")e.suppressed++;else e.count++;e.names.add(n.ModelName||n.NodeId);placed.set(it.match,e)}
+    if(isOff(n))e.suppressed++;else e.count++;e.names.add(displayName(n));placed.set(it.match,e)}
   const bomTotal=new Map(),bomBalloons=new Map();
   for(const r of active)if(r.partNo){const k=norm(r.partNo);bomTotal.set(k,(bomTotal.get(k)||0)+r.qty);bomBalloons.set(k,[...(bomBalloons.get(k)||[]),r.balloon])}
   // 補材フォルダ
@@ -173,15 +182,11 @@ function buildCompare(){
   for(const n of d.map.values()){if(n.NodeType!=="folder")continue;const it=info.get(n.NodeId);if(it.sup&&it.sup.folder===n){const a=supFolders.get(it.sup.balloon)??[];a.push(n);supFolders.set(it.sup.balloon,a)}}
   const supModels=new Map();
   for(const n of comps){const it=info.get(n.NodeId);if(!it.sup||it.underMatched||it.underUnmatched)continue;
-    const m=supModels.get(it.sup.balloon)??new Map(),key=n.ModelName||n.NodeId,e=m.get(key)??{count:0,suppressed:0};
-    if(n.Suppressed==="true")e.suppressed++;else e.count++;m.set(key,e);supModels.set(it.sup.balloon,m)}
+    const m=supModels.get(it.sup.balloon)??new Map(),key=displayName(n),e=m.get(key)??{count:0,suppressed:0};
+    if(isOff(n))e.suppressed++;else e.count++;m.set(key,e);supModels.set(it.sup.balloon,m)}
   // 行の組み立て
   const balloons=[...new Set([...active.map(r=>r.balloon),...supFolders.keys()])].sort(byBalloon);
-  const sectionOf=new Map();for(const r of active)if(!sectionOf.has(r.balloon))sectionOf.set(r.balloon,r.section);
-  let lastSection=null;
   for(const b of balloons){
-    const sec=sectionOf.get(b)??"（部品表になし）";
-    if(sec!==lastSection){cmpRows.push({kind:"section",label:sec});lastSection=sec}
     for(const r of active.filter(r=>r.balloon===b&&r.partNo)){
       const k=norm(r.partNo),e=placed.get(k),total=bomTotal.get(k),multi=bomBalloons.get(k).length>1;
       const model=e?e.count:0;let status,cls,note="";
@@ -189,7 +194,6 @@ function buildCompare(){
       else if(model===total){status="一致";cls="ok"}
       else{status="数量差異";cls="warn"}
       if(multi)note="同一品番が風船 "+bomBalloons.get(k).join(", ")+" にあり（部品表計 "+total+"）";
-      if(e&&e.suppressed)note+=(note?" / ":"")+"抑制中 "+e.suppressed+"個（数に含めず）";
       cmpRows.push({kind:"part",balloon:b,partNo:r.partNo,name:r.name,kaihai:r.kaihai,bomQty:r.qty,models:e?[...e.names]:[],modelQty:e?model:null,status,cls,note});
     }
     const sups=active.filter(r=>r.balloon===b&&!r.partNo),folders=supFolders.get(b)||[],mm=supModels.get(b);
@@ -207,10 +211,10 @@ function buildCompare(){
   // 部品表にないモデル
   const extra=new Map();
   for(const n of comps){const it=info.get(n.NodeId);if(it.sup||it.underMatched||it.underUnmatched)continue;if(it.match&&activeNos.has(it.match))continue;
-    const key=n.ModelName||n.NodeId,e=extra.get(key)??{count:0,suppressed:0,deleted:it.match&&deletedNos.has(it.match)};
-    if(n.Suppressed==="true")e.suppressed++;else e.count++;extra.set(key,e)}
-  if(extra.size){cmpRows.push({kind:"section",label:"部品表にないモデル"});
-    for(const [name,e] of [...extra].sort((a,b)=>a[0].localeCompare(b[0])))cmpRows.push({kind:"extra",balloon:"",partNo:"",name:"",bomQty:null,models:[name],modelQty:e.count,status:e.deleted?"部品表で削除済み":"部品表になし",cls:e.deleted?"ng":"warn",note:e.suppressed?"抑制中 "+e.suppressed+"個":""})}
+    const key=displayName(n),e=extra.get(key)??{count:0,suppressed:0,deleted:it.match&&deletedNos.has(it.match)};
+    if(isOff(n))e.suppressed++;else e.count++;extra.set(key,e)}
+  if(extra.size){
+    for(const [name,e] of [...extra].sort((a,b)=>a[0].localeCompare(b[0])))cmpRows.push({kind:"extra",balloon:"",partNo:"",name:"",bomQty:null,models:[name],modelQty:e.count,status:e.deleted?"部品表で削除済み":"部品表になし",cls:e.deleted?"ng":"warn",note:""})}
 }
 const lines=items=>items.length?'<ul class="lines">'+items.map(i=>"<li>"+esc(i.name)+(i.qty!=null?'<span class="q">×'+esc(i.qty)+"</span>":"")+(i.suppressed?'<span class="q">（抑制 '+i.suppressed+"）</span>":"")+"</li>").join("")+"</ul>":'<span class="muted">—</span>';
 function renderCompare(){
@@ -242,10 +246,17 @@ function renderCompare(){
 }
 $("bomFile").addEventListener("change",async e=>{
   const file=e.target.files[0];e.target.value="";if(!file)return;
-  try{$("cmpMessage").textContent="読み込み中…";const X=await loadXLSX();bom=parseBOM(X,await file.arrayBuffer(),file.name);renderCompare()}
+  try{$("cmpMessage").textContent="読み込み中…";const X=await loadXLSX();bom=parseBOM(X,await file.arrayBuffer(),file.name);renderCompare();store.set("bom",bom)}
   catch(err){$("cmpMessage").textContent=file.name+" の読込に失敗: "+err.message}
 });
-$("cmpFilter").onchange=renderCompare;$("cmpSearch").addEventListener("input",renderCompare);
+function showTab(name){
+  for(const b of document.querySelectorAll(".tab"))b.setAttribute("aria-selected",String(b.dataset.tab===name));
+  $("tab-tree").hidden=name!=="tree";$("tab-cmp").hidden=name!=="cmp";
+  try{localStorage.setItem("swtv-tab",name)}catch(e){}
+}
+for(const b of document.querySelectorAll(".tab"))b.onclick=()=>showTab(b.dataset.tab);
+try{const t=localStorage.getItem("swtv-tab");if(t==="cmp")showTab("cmp")}catch(e){}
+$("cmpFilter").onchange=renderCompare;$("cmpCountSupp").onchange=renderCompare;$("cmpSearch").addEventListener("input",renderCompare);
 $("cmpExport").onclick=async()=>{
   if(!cmpRows.length)return;const X=await loadXLSX();
   const list=items=>items.map(i=>i.name+(i.qty!=null?" ×"+i.qty:"")).join("\n");
@@ -260,4 +271,25 @@ $("cmpExport").onclick=async()=>{
   const url=URL.createObjectURL(new Blob([X.write(wb,{bookType:"xlsx",type:"array"})],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})),a=document.createElement("a");
   a.href=url;a.download=(bom.plno+"_"+datasets[current].assembly).replace(/[\\/:*?"<>|\s]+/g,"_")+"_照合.xlsx";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
+
+/* ---------- 読み込んだデータの保存と復元（このブラウザ内のIndexedDBのみ。外部には送信しない） ---------- */
+const store=(()=>{
+  let dbp=null;
+  const db=()=>dbp??=new Promise((ok,ng)=>{const r=indexedDB.open("swtv",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>ok(r.result);r.onerror=()=>ng(r.error)});
+  const run=(mode,fn)=>db().then(d=>new Promise((ok,ng)=>{const t=d.transaction("kv",mode),q=fn(t.objectStore("kv"));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>ng(t.error)}));
+  const safe=p=>p.catch(err=>{console.warn("保存データにアクセスできません",err);return undefined});
+  return {get:k=>safe(run("readonly",s=>s.get(k))),set:(k,v)=>safe(run("readwrite",s=>{s.put(v,k)})),clear:()=>safe(run("readwrite",s=>{s.clear()}))};
+})();
+let savedCsv=[];
+function saveCsv(name,text){savedCsv=savedCsv.filter(c=>c.name!==name).concat({name,text});store.set("csv",savedCsv)}
+$("clearSaved").onclick=async()=>{if(!confirm("このブラウザに保存した構成CSVと部品表を消去します。表示中のデータも消えます。よろしいですか？"))return;await store.clear();location.reload()};
+(async()=>{
+  const [csv,cur,savedBom]=await Promise.all([store.get("csv"),store.get("current"),store.get("bom")]);
+  if(Array.isArray(csv)&&csv.length){
+    savedCsv=csv;
+    for(const c of csv){try{addData(c.name,parseCSV(c.text))}catch(err){console.warn(c.name,err)}}
+    if(datasets.length){switchTo(Number.isInteger(cur)&&cur<datasets.length?cur:datasets.length-1);$("message").textContent="前回読み込んだデータを復元しました（"+datasets.length+"件）。"+$("message").textContent}
+  }
+  if(savedBom&&Array.isArray(savedBom.rows)){bom=savedBom;renderCompare()}
+})();
 </script></body></html>
