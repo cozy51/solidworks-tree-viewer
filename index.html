@@ -145,8 +145,10 @@ const byBalloon=(a,b)=>{const x=balloonKey(a),y=balloonKey(b);return x[0]-y[0]||
 const SUP_FOLDER=/^\s*\+\s*(\d+)/;
 // 構成ツリーのモデル名末尾の「-1」「<1>」はインスタンス番号なので除く
 const stripInstance=s=>String(s??"").trim().replace(/(?:-\d+|<\d+>)$/,"");
-const displayName=n=>stripInstance(n.ModelName)||n.NodeId;
-const baseName=n=>norm(stripInstance(n.ModelName));
+// サブアセンブリ内のモデルは「親インスタンス/モデル名」の形で出力されるため、最後の「/」以降をモデル名として扱う
+const lastSegment=s=>String(s??"").split("/").pop().trim();
+const displayName=n=>stripInstance(lastSegment(n.ModelName))||n.NodeId;
+const baseName=n=>norm(stripInstance(lastSegment(n.ModelName)));
 function buildCompare(){
   cmpRows=[];
   if(!bom||current<0)return;
@@ -303,10 +305,12 @@ function renderCompare(){
       // 品番とモデルが対応していれば（数量が違っても）品番・モデル名は緑、数量は一致なら緑・差異ならオレンジ
       const found=r.kind==="part"&&(r.status==="一致"||r.status==="数量差異"),qtyOk=r.status==="一致";
       const exact=found;
-      const pre=found?Math.max(0,...r.models.map(nm=>commonPrefix(r.partNo,nm,9))):0;
+      // 品番の先頭9桁がすべて一致したときだけハイライトする
+      const need=Math.min(9,String(r.partNo).length),full=nm=>commonPrefix(r.partNo,nm,9)===need?need:0;
+      const pre=found?Math.max(0,...r.models.map(full)):0;
       const mark=t=>hlRanges(t,[[0,pre]]);
       const number=t=>found?'<span class="'+(qtyOk?"match-num":"diff-num")+'">'+esc(t)+'</span>':esc(t);
-      out+='<tr><td>'+esc(r.balloon)+'</td><td>'+(r.kind==="part"?"部品":"モデル")+(r.kaihai==="A"?'<span class="sub">改廃A</span>':"")+'</td><td><span class="code">'+mark(r.partNo)+'</span></td><td>'+(r.name?esc(r.name):'<span class="muted">—</span>')+'</td><td class="num">'+(r.bomQty==null?"":number(r.bomQty))+'</td><td>'+(exact?'<ul class="lines">'+r.models.map(name=>'<li>'+hlRanges(name,[[0,commonPrefix(r.partNo,name,9)]])+'</li>').join("")+'</ul>':lines(r.models.map(name=>({name}))))+'</td><td class="num">'+(r.modelQty==null?"":number(r.modelQty))+'</td><td>'+st+'</td></tr>';
+      out+='<tr><td>'+esc(r.balloon)+'</td><td>'+(r.kind==="part"?"部品":"モデル")+(r.kaihai==="A"?'<span class="sub">改廃A</span>':"")+'</td><td><span class="code">'+mark(r.partNo)+'</span></td><td>'+(r.name?esc(r.name):'<span class="muted">—</span>')+'</td><td class="num">'+(r.bomQty==null?"":number(r.bomQty))+'</td><td>'+(exact?'<ul class="lines">'+r.models.map(name=>'<li>'+hlRanges(name,[[0,full(name)]])+'</li>').join("")+'</ul>':lines(r.models.map(name=>({name}))))+'</td><td class="num">'+(r.modelQty==null?"":number(r.modelQty))+'</td><td>'+st+'</td></tr>';
     }
   }
   $("cmpTable").innerHTML=out?'<table class="cmp"><thead><tr class="grp-row"><th colspan="2"></th><th colspan="3" class="grp bom">部品表</th><th colspan="2" class="grp mdl">SOLIDWORKS モデル</th><th></th></tr><tr><th>風船</th><th>区分</th><th>品番 / 補材フォルダ</th><th>品名</th><th>数量</th><th>モデル名 / コンフィグ</th><th>数量</th><th>判定</th></tr></thead><tbody>'+out+"</tbody></table>":'<div class="empty" style="padding:24px 16px">該当する行がありません。</div>';
