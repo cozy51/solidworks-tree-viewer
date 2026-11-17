@@ -23,7 +23,7 @@ table.cmp{border-collapse:collapse;width:100%;font-size:13px}table.cmp th{positi
 </style>
 </head>
 <body>
-<header><div class="brand"><img src="icons/favicon.svg" alt=""><div><h1>SOLIDWORKS 構成ツリービューア</h1><p>CSVからフォルダ・モデルの階層を再現します。読み込んだデータはサーバーに送信されません。</p></div></div><div class="actions"><label class="upload">CSVを追加<input id="files" type="file" accept=".csv,text/csv" multiple></label><button id="export" disabled>JSON出力</button></div></header>
+<header><div class="brand"><img src="icons/favicon.svg" alt=""><div><h1>SOLIDWORKS 構成ツリービューア</h1><p>CSVからフォルダ・モデルの階層を再現します。読み込んだデータはサーバーに送信されません。</p></div></div><div class="actions"><label class="upload">CSVを追加<input id="files" type="file" accept=".csv,text/csv" multiple></label><button id="export" disabled>JSON出力</button><button id="clearSaved" title="このブラウザに保存した構成CSV・部品表を消去します">保存データを消去</button></div></header>
 <nav class="tabs" role="tablist"><button class="tab" role="tab" data-tab="tree" aria-selected="true">構成ツリー</button><button class="tab" role="tab" data-tab="cmp" aria-selected="false">部品表照合</button></nav>
 <div id="tab-tree" role="tabpanel"><div class="stats"><div class="stat"><strong id="folderCount">0</strong><span>フォルダ数</span></div><div class="stat"><strong id="modelCount">0</strong><span>モデル配置数</span></div><div class="stat"><strong id="asmCount">0</strong><span>サブアセンブリ数</span></div><div class="stat"><strong id="suppCount">0</strong><span>抑制ノード数</span></div></div>
 <div class="layout"><section class="panel"><div class="panel-header"><strong id="assemblyTitle">CSVを読み込んでください</strong><div class="bar"><input id="search" type="search" placeholder="フォルダ名・モデル名で検索"><button id="expand">すべて展開</button><button id="collapse">すべて折りたたむ</button></div><div class="bar"><select id="assemblySelect" aria-label="表示するアセンブリ"></select></div></div><div class="notice" id="message">CSVを追加すると構成ツリーが表示されます。</div><div class="tree" id="tree" role="tree"></div></section><aside class="panel"><div class="panel-header"><strong>選択した項目の詳細</strong></div><div class="details" id="details"><div class="empty">ツリーの項目を選択してください。</div></div></aside></div></div>
@@ -58,7 +58,7 @@ function addData(name,rows){
   switchTo(i>=0?i:datasets.length-1);
 }
 function switchTo(i){
-  current=i;selectedId=null;let d=datasets[i];expanded=new Set(d.roots.map(r=>r.NodeId));
+  current=i;store.set("current",i);selectedId=null;let d=datasets[i];expanded=new Set(d.roots.map(r=>r.NodeId));
   $("assemblySelect").value=String(i);$("assemblyTitle").textContent=d.assembly;
   $("folderCount").textContent=d.rows.filter(r=>r.NodeType==="folder").length.toLocaleString();
   $("modelCount").textContent=d.rows.filter(r=>r.NodeType==="component").length.toLocaleString();
@@ -98,7 +98,7 @@ $("search").addEventListener("input",render);
 $("expand").onclick=()=>{if(current>=0){expanded=new Set(datasets[current].map.keys());render()}};
 $("collapse").onclick=()=>{expanded.clear();render()};
 $("assemblySelect").onchange=e=>switchTo(Number(e.target.value));
-$("files").addEventListener("change",async e=>{for(const file of e.target.files){try{addData(file.name,parseCSV(await file.text()))}catch(err){alert(file.name+" の読込に失敗: "+err.message)}}e.target.value=""});
+$("files").addEventListener("change",async e=>{for(const file of e.target.files){try{const text=await file.text();addData(file.name,parseCSV(text));saveCsv(file.name,text)}catch(err){alert(file.name+" の読込に失敗: "+err.message)}}e.target.value=""});
 $("export").onclick=()=>{if(current<0)return;const d=datasets[current],data={schemaVersion:"1.0",assemblyName:d.assembly,sourceFile:d.name,nodes:d.rows.map(r=>({id:r.NodeId,parentId:r.ParentId||null,level:Number(r.Level),order:Number(r.Order),nodeType:r.NodeType,folderName:r.FolderName,folderPath:r.FolderPath,modelName:r.ModelName,componentType:r.ComponentType,filePath:r.FilePath,configuration:r.Configuration,suppressed:r.Suppressed==="true"}))},url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json;charset=utf-8"})),a=document.createElement("a");a.href=url;a.download=d.assembly.replace(/[^\w\u3040-\u30ff\u3400-\u9fff.-]/g,"_")+"_Tree.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 
 /* ---------- 部品表照合 ---------- */
@@ -246,7 +246,7 @@ function renderCompare(){
 }
 $("bomFile").addEventListener("change",async e=>{
   const file=e.target.files[0];e.target.value="";if(!file)return;
-  try{$("cmpMessage").textContent="読み込み中…";const X=await loadXLSX();bom=parseBOM(X,await file.arrayBuffer(),file.name);renderCompare()}
+  try{$("cmpMessage").textContent="読み込み中…";const X=await loadXLSX();bom=parseBOM(X,await file.arrayBuffer(),file.name);renderCompare();store.set("bom",bom)}
   catch(err){$("cmpMessage").textContent=file.name+" の読込に失敗: "+err.message}
 });
 function showTab(name){
@@ -271,4 +271,25 @@ $("cmpExport").onclick=async()=>{
   const url=URL.createObjectURL(new Blob([X.write(wb,{bookType:"xlsx",type:"array"})],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})),a=document.createElement("a");
   a.href=url;a.download=(bom.plno+"_"+datasets[current].assembly).replace(/[\\/:*?"<>|\s]+/g,"_")+"_照合.xlsx";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
+
+/* ---------- 読み込んだデータの保存と復元（このブラウザ内のIndexedDBのみ。外部には送信しない） ---------- */
+const store=(()=>{
+  let dbp=null;
+  const db=()=>dbp??=new Promise((ok,ng)=>{const r=indexedDB.open("swtv",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>ok(r.result);r.onerror=()=>ng(r.error)});
+  const run=(mode,fn)=>db().then(d=>new Promise((ok,ng)=>{const t=d.transaction("kv",mode),q=fn(t.objectStore("kv"));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>ng(t.error)}));
+  const safe=p=>p.catch(err=>{console.warn("保存データにアクセスできません",err);return undefined});
+  return {get:k=>safe(run("readonly",s=>s.get(k))),set:(k,v)=>safe(run("readwrite",s=>{s.put(v,k)})),clear:()=>safe(run("readwrite",s=>{s.clear()}))};
+})();
+let savedCsv=[];
+function saveCsv(name,text){savedCsv=savedCsv.filter(c=>c.name!==name).concat({name,text});store.set("csv",savedCsv)}
+$("clearSaved").onclick=async()=>{if(!confirm("このブラウザに保存した構成CSVと部品表を消去します。表示中のデータも消えます。よろしいですか？"))return;await store.clear();location.reload()};
+(async()=>{
+  const [csv,cur,savedBom]=await Promise.all([store.get("csv"),store.get("current"),store.get("bom")]);
+  if(Array.isArray(csv)&&csv.length){
+    savedCsv=csv;
+    for(const c of csv){try{addData(c.name,parseCSV(c.text))}catch(err){console.warn(c.name,err)}}
+    if(datasets.length){switchTo(Number.isInteger(cur)&&cur<datasets.length?cur:datasets.length-1);$("message").textContent="前回読み込んだデータを復元しました（"+datasets.length+"件）。"+$("message").textContent}
+  }
+  if(savedBom&&Array.isArray(savedBom.rows)){bom=savedBom;renderCompare()}
+})();
 </script></body></html>
