@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SOLIDWORKS 構成ツリービューア</title>
+<title>SOLIDWORKS 構成確認ツール</title>
 <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -27,7 +27,7 @@ table.cmp th.grp.bom,table.cmp thead tr:last-child th:nth-child(3),table.cmp tbo
 </style>
 </head>
 <body>
-<header><div class="brand"><img src="icons/favicon.svg" alt=""><div><h1>SOLIDWORKS 構成ツリービューア</h1><p>CSVからフォルダ・モデルの階層を再現します。読み込んだデータはサーバーに送信されません。</p></div></div><div class="actions"><label class="upload">CSVを追加<input id="files" type="file" accept=".csv,text/csv" multiple></label><button id="export" disabled>JSON出力</button><button id="clearSaved" title="このブラウザに保存した構成CSV・部品表を消去します">保存データを消去</button></div></header>
+<header><div class="brand"><img src="icons/favicon.svg" alt=""><div><h1>SOLIDWORKS 構成確認ツール</h1><p>構成ツリーの表示と、部品表との照合を行います。読み込んだデータはサーバーに送信されません。</p></div></div><div class="actions"><label class="upload">CSVを追加<input id="files" type="file" accept=".csv,text/csv" multiple></label><button id="export" disabled>JSON出力</button><button id="clearSaved" title="このブラウザに保存した構成CSV・部品表を消去します">保存データを消去</button></div></header>
 <nav class="tabs" role="tablist"><button class="tab" role="tab" data-tab="tree" aria-selected="true">構成ツリー</button><button class="tab" role="tab" data-tab="cmp" aria-selected="false">部品表照合</button></nav>
 <div id="tab-tree" role="tabpanel"><div class="stats"><div class="stat"><strong id="folderCount">0</strong><span>フォルダ数</span></div><div class="stat"><strong id="modelCount">0</strong><span>モデル配置数</span></div><div class="stat"><strong id="asmCount">0</strong><span>サブアセンブリ数</span></div><div class="stat"><strong id="suppCount">0</strong><span>抑制ノード数</span></div></div>
 <div class="layout"><section class="panel"><div class="panel-header"><strong id="assemblyTitle">CSVを読み込んでください</strong><div class="bar"><input id="search" type="search" placeholder="フォルダ名・モデル名で検索"><button id="expand">すべて展開</button><button id="collapse">すべて折りたたむ</button></div><div class="bar"><select id="assemblySelect" aria-label="表示するアセンブリ"></select></div></div><div class="notice" id="message">CSVを追加すると構成ツリーが表示されます。</div><div class="tree" id="tree" role="tree"></div></section><aside class="panel"><div class="panel-header"><strong>選択した項目の詳細</strong></div><div class="details" id="details"><div class="empty">ツリーの項目を選択してください。</div></div></aside></div></div>
