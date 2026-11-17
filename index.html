@@ -3,17 +3,24 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SOLIDWORKS 構成ツリービューア</title>
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2563aa">
 <style>
 :root{font-family:system-ui,"Yu Gothic",Meiryo,sans-serif;color:#243346;background:#f3f6fa}
 *{box-sizing:border-box}body{margin:0}header{background:#fff;padding:18px 24px;border-bottom:1px solid #dce3ec;display:flex;flex-wrap:wrap;gap:15px;align-items:center;justify-content:space-between}h1{font-size:21px;margin:0}header p{font-size:12px;color:#657588;margin:5px 0 0}
 button,.upload{font:inherit;border:1px solid #cbd6e2;border-radius:8px;background:#fff;padding:9px 12px;cursor:pointer}.upload{display:inline-block;background:#2563aa;color:#fff;border-color:#2563aa}.upload input{display:none}button:hover{background:#edf4fc}.upload:hover{background:#194f8b}
 .actions{display:flex;gap:8px;flex-wrap:wrap}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 20px}.stat,.panel{background:#fff;border:1px solid #dce3eb;border-radius:11px}.stat{padding:14px}.stat strong{display:block;font-size:23px}.stat span{font-size:12px;color:#66758a}
 .layout{display:grid;grid-template-columns:minmax(300px,1.25fr) minmax(280px,.85fr);gap:15px;margin:0 20px 20px}.panel{min-width:0;overflow:hidden}.panel-header{padding:16px;border-bottom:1px solid #e7ebf1}.panel-header strong{display:block}.bar{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}input[type=search],select{font:inherit;border:1px solid #ccd7e3;border-radius:7px;padding:9px;min-width:0}input[type=search]{flex:1;min-width:140px}select{max-width:100%}.tree{padding:12px;max-height:68vh;overflow:auto;min-height:220px}.tree-node{display:flex;gap:5px;align-items:center;cursor:pointer;border-radius:5px;min-height:30px;font-size:13px;white-space:nowrap}.tree-node:hover{background:#f0f5fc}.tree-node.active{background:#e4efff}.toggle{border:0;padding:2px;width:26px;background:transparent}.children{padding-left:22px;border-left:1px solid #e6eaf0;margin-left:12px}.name{overflow:hidden;text-overflow:ellipsis}.tag{font-size:10px;color:#7c8796;background:#f0f2f5;border-radius:4px;padding:2px 5px}.details{padding:18px;overflow:auto;max-height:68vh}dl{margin:0}dt{font-size:12px;color:#617187;margin-top:13px}dd{margin:4px 0;overflow-wrap:anywhere;font-size:14px}footer{padding:0 20px 20px;font-size:12px;color:#718096}.notice{margin:10px 14px;color:#62718a;font-size:12px}.empty{color:#7d8a9b;font-size:14px;padding:24px 9px}
+.brand{display:flex;align-items:center;gap:12px}.brand img{width:40px;height:40px;flex:none;filter:drop-shadow(0 2px 4px rgba(23,63,120,.25))}
+.ico{width:16px;height:16px;flex:none;display:block}.ico-folder{color:#d4952b}.ico-asm{color:#2563aa}.ico-part{color:#5b7088}
 @media(max-width:750px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-<header><div><h1>📁 SOLIDWORKS 構成ツリービューア</h1><p>CSVからフォルダ・モデルの階層を再現します。読み込んだデータはサーバーに送信されません。</p></div><div class="actions"><label class="upload">CSVを追加<input id="files" type="file" accept=".csv,text/csv" multiple></label><button id="export" disabled>JSON出力</button></div></header>
+<header><div class="brand"><img src="icons/favicon.svg" alt=""><div><h1>SOLIDWORKS 構成ツリービューア</h1><p>CSVからフォルダ・モデルの階層を再現します。読み込んだデータはサーバーに送信されません。</p></div></div><div class="actions"><label class="upload">CSVを追加<input id="files" type="file" accept=".csv,text/csv" multiple></label><button id="export" disabled>JSON出力</button></div></header>
 <div class="stats"><div class="stat"><strong id="folderCount">0</strong><span>フォルダ数</span></div><div class="stat"><strong id="modelCount">0</strong><span>モデル配置数</span></div><div class="stat"><strong id="asmCount">0</strong><span>サブアセンブリ数</span></div><div class="stat"><strong id="suppCount">0</strong><span>抑制ノード数</span></div></div>
 <div class="layout"><section class="panel"><div class="panel-header"><strong id="assemblyTitle">CSVを読み込んでください</strong><div class="bar"><input id="search" type="search" placeholder="フォルダ名・モデル名で検索"><button id="expand">すべて展開</button><button id="collapse">すべて折りたたむ</button></div><div class="bar"><select id="assemblySelect" aria-label="表示するアセンブリ"></select></div></div><div class="notice" id="message">CSVを追加すると構成ツリーが表示されます。</div><div class="tree" id="tree" role="tree"></div></section><aside class="panel"><div class="panel-header"><strong>選択した項目の詳細</strong></div><div class="details" id="details"><div class="empty">ツリーの項目を選択してください。</div></div></aside></div>
 <footer>参照専用：SOLIDWORKSやCADファイルを変更しません。Google Drive保存機能は未実装です。業務データをGitHubへコミットしないでください。</footer>
@@ -54,6 +61,13 @@ function switchTo(i){
   $("details").innerHTML='<div class="empty">ツリーの項目を選択してください。</div>';
   $("search").value="";$("export").disabled=false;render();
 }
+const svg=(c,b)=>'<svg class="ico '+c+'" viewBox="0 0 16 16" aria-hidden="true">'+b+"</svg>";
+const ICONS={
+  folder:svg("ico-folder",'<path d="M1.5 4A1.5 1.5 0 0 1 3 2.5h3l1.5 1.5H13A1.5 1.5 0 0 1 14.5 5.5v6.5A1.5 1.5 0 0 1 13 13.5H3A1.5 1.5 0 0 1 1.5 12Z" fill="currentColor"/>'),
+  folderOpen:svg("ico-folder",'<path d="M1.5 4A1.5 1.5 0 0 1 3 2.5h3l1.5 1.5H12A1.5 1.5 0 0 1 13.5 5.5V7H5L2.6 13.2A1.5 1.5 0 0 1 1.5 12Z" fill="currentColor" fill-opacity=".55"/><path d="M4.4 7.5h10.4a.6.6 0 0 1 .56.82l-1.9 4.6a1 1 0 0 1-.92.58H2.2Z" fill="currentColor"/>'),
+  asm:svg("ico-asm",'<path d="M5 1.6 8.2 3.4 5 5.2 1.8 3.4Z" fill="currentColor"/><path d="M1.8 3.4 5 5.2v3.6L1.8 7Z" fill="currentColor" fill-opacity=".7"/><path d="M5 5.2 8.2 3.4V7L5 8.8Z" fill="currentColor" fill-opacity=".45"/><path d="M11 6.8 14.2 8.6 11 10.4 7.8 8.6Z" fill="currentColor"/><path d="M7.8 8.6 11 10.4V14l-3.2-1.8Z" fill="currentColor" fill-opacity=".7"/><path d="M11 10.4l3.2-1.8v3.6L11 14Z" fill="currentColor" fill-opacity=".45"/>'),
+  part:svg("ico-part",'<path d="M8 1.8 13.4 4.9 8 8 2.6 4.9Z" fill="currentColor"/><path d="M2.6 4.9 8 8v6.2L2.6 11.1Z" fill="currentColor" fill-opacity=".7"/><path d="M8 8l5.4-3.1v6.2L8 14.2Z" fill="currentColor" fill-opacity=".45"/>')
+};
 function render(){
   if(current<0)return;
   const d=datasets[current],q=$("search").value.toLocaleLowerCase().trim(),keep=new Set();
@@ -61,8 +75,8 @@ function render(){
   const seen=new Set();
   function nodeHTML(n){if(seen.has(n.NodeId)||q&&!keep.has(n.NodeId))return "";seen.add(n.NodeId);
     const open=!!q||expanded.has(n.NodeId),folder=n.NodeType==="folder",label=folder?n.FolderName:n.ModelName||n.NodeId;
-    const icon=folder?(open?"📂":"📁"):n.ComponentType==="assembly"?"📦":"⚙️";
-    let out='<div class="tree-node '+(n.NodeId===selectedId?"active":"")+'" data-id="'+esc(n.NodeId)+'"><button class="toggle" data-toggle="'+esc(n.NodeId)+'" aria-label="展開切替">'+(n.children.length?(open?"▾":"▸"):"")+'</button><span>'+icon+'</span><span class="name" title="'+esc(label)+'">'+esc(label)+'</span>'+(n.Suppressed==="true"?'<span class="tag">抑制</span>':"")+"</div>";
+    const icon=folder?(open&&n.children.length?ICONS.folderOpen:ICONS.folder):n.ComponentType==="assembly"?ICONS.asm:ICONS.part;
+    let out='<div class="tree-node '+(n.NodeId===selectedId?"active":"")+'" data-id="'+esc(n.NodeId)+'"><button class="toggle" data-toggle="'+esc(n.NodeId)+'" aria-label="展開切替">'+(n.children.length?(open?"▾":"▸"):"")+'</button>'+icon+'<span class="name" title="'+esc(label)+'">'+esc(label)+'</span>'+(n.Suppressed==="true"?'<span class="tag">抑制</span>':"")+"</div>";
     if(open&&n.children.length)out+='<div class="children">'+n.children.map(nodeHTML).join("")+"</div>";return out;
   }
   $("tree").innerHTML=d.roots.map(nodeHTML).join("")||'<div class="empty">該当する項目がありません。</div>';
