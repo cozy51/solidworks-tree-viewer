@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82d6"/>
+      <stop offset="1" stop-color="#173f78"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
+  <!-- root: isometric cube (assembly) -->
+  <path d="M21 9.5 31 15.25 21 21 11 15.25Z" fill="#fff"/>
+  <path d="M11 15.25 21 21V32.5L11 26.75Z" fill="#fff" fill-opacity=".72"/>
+  <path d="M21 21 31 15.25V26.75L21 32.5Z" fill="#fff" fill-opacity=".45"/>
+  <!-- tree connectors -->
+  <path d="M21 35V46.5Q21 51.5 26 51.5H33M21 40.5H33" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- child nodes -->
+  <rect x="35" y="36.5" width="19" height="8" rx="4" fill="#fff"/>
+  <rect x="35" y="47.5" width="19" height="8" rx="4" fill="#ffb547"/>
+</svg>
