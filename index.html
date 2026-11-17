@@ -313,7 +313,7 @@ function renderCompare(){
       out+='<tr><td>'+esc(r.balloon)+'</td><td>'+(r.kind==="part"?"部品":"モデル")+(r.kaihai==="A"?'<span class="sub">改廃A</span>':"")+'</td><td><span class="code">'+mark(r.partNo)+'</span></td><td>'+(r.name?esc(r.name):'<span class="muted">—</span>')+'</td><td class="num">'+(r.bomQty==null?"":number(r.bomQty))+'</td><td>'+(exact?'<ul class="lines">'+r.models.map(name=>'<li>'+hlRanges(name,[[0,full(name)]])+'</li>').join("")+'</ul>':lines(r.models.map(name=>({name}))))+'</td><td class="num">'+(r.modelQty==null?"":number(r.modelQty))+'</td><td>'+st+'</td></tr>';
     }
   }
-  $("cmpTable").innerHTML=out?'<table class="cmp"><thead><tr class="grp-row"><th colspan="2"></th><th colspan="3" class="grp bom">部品表</th><th colspan="2" class="grp mdl">SOLIDWORKS モデル</th><th></th></tr><tr><th>風船</th><th>区分</th><th>品番 / 補材フォルダ</th><th>品名</th><th>数量</th><th>モデル名 / コンフィグ</th><th>数量</th><th>判定</th></tr></thead><tbody>'+out+"</tbody></table>":'<div class="empty" style="padding:24px 16px">該当する行がありません。</div>';
+  $("cmpTable").innerHTML=out?'<table class="cmp"><colgroup><col style="width:4%"><col style="width:5%"><col style="width:13%"><col style="width:21%"><col style="width:6%"><col style="width:34%"><col style="width:6%"><col style="width:11%"></colgroup><thead><tr class="grp-row"><th colspan="2"></th><th colspan="3" class="grp bom">部品表</th><th colspan="2" class="grp mdl">SOLIDWORKS モデル</th><th></th></tr><tr><th>風船</th><th>区分</th><th>品番 / 補材フォルダ</th><th>品名</th><th>数量</th><th>モデル名 / コンフィグ</th><th>数量</th><th>判定</th></tr></thead><tbody>'+out+"</tbody></table>":'<div class="empty" style="padding:24px 16px">該当する行がありません。</div>';
 }
 $("bomFile").addEventListener("change",async e=>{
   const file=e.target.files[0];e.target.value="";if(!file)return;
